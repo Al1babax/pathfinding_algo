@@ -1,13 +1,18 @@
 import { useEffect, useState, useRef } from 'react';
+import dropdownImage from "../resources/dropdown.png";
+
 
 export function Home() {
 
     const box_info = [];
     let boxes_html = [];
+    const algorithms = ["Dijkstra's Algorithm", "A* Search", "Breadth First Search", "Depth First Search"]
 
     const [boxInfo, setBoxInfo] = useState([]);
     const [shortestPathBoxes, setShortestPathBoxes] = useState([]);
     const [showSolution, setShowSolution] = useState(false);
+    const [algorithm, setAlgorithm] = useState("Choose algorithm");
+    const [algorithmDropdown, setAlgorithmDropdown] = useState(false);
     const renderCounter = useRef(0);
 
     function init_boxes() {
@@ -43,13 +48,13 @@ export function Home() {
 
     }
 
-    function drawWalls(){
-        for(let i = 0; i < 900; i++){
+    function drawWalls() {
+        for (let i = 0; i < 900; i++) {
             let randomInteger = Math.floor(Math.random() * 3); // 0: no wall, 1: wall right, 2: wall bottom
-            if(randomInteger === 1 && !box_info[i].isShortestPath){
+            if (randomInteger === 1 && !box_info[i].isShortestPath) {
                 box_info[i].hasWallRight = true;
             }
-            if(randomInteger === 2 && !box_info[i].isShortestPath){
+            if (randomInteger === 2 && !box_info[i].isShortestPath) {
                 box_info[i].hasWallBottom = true;
             }
         }
@@ -137,15 +142,32 @@ export function Home() {
         }
     }
 
-    function showPath(){
+    function showPath() {
         //console.log(shortestPathBoxes)
         let temp_box_Info = [...boxInfo];
-        for(let i = 0; i < shortestPathBoxes.length; i++){
+        for (let i = 0; i < shortestPathBoxes.length; i++) {
             temp_box_Info[shortestPathBoxes[i]].color = showSolution ? 'bg-sky-500' : 'bg-red-500';
         }
         setBoxInfo(temp_box_Info);
         showSolution ? setShowSolution(false) : setShowSolution(true);
     }
+
+
+    let dropdownbox = [];
+    let dropdownOptions = [];
+
+    algorithms.map((algorithm, index) => {
+        dropdownOptions.push(
+            <button className='w-full h-full px-1 py-2 hover:bg-slate-500' onClick={() => setAlgorithm(algorithm)}>{algorithm}</button>
+        )
+    })
+
+    dropdownbox.push(
+        <div className="box w-full absolute top-9 z-10 bg-slate-400">
+            {dropdownOptions}
+        </div>
+    )
+
 
     // init game
     useEffect(() => {
@@ -163,10 +185,15 @@ export function Home() {
     return (
         <>
             <div className="page w-full h-screen bg-slate-200 flex flex-col items-center justify-center">
-                <div className="controls w-[1000px] h-[70px] bg-slate-300 flex gap-10 justify-center items-center">
+                <div className="controls w-[1000px] h-[70px] bg-slate-300 flex gap-5 justify-center items-center">
                     <button className="btn h-10 bg-slate-400 rounded hover:brightness-110 px-2">Start</button>
                     <button className="btn h-10 bg-slate-400 rounded hover:brightness-110 px-2" onClick={init_boxes}>Reset</button>
                     <button className="btn h-10 bg-slate-400 rounded hover:brightness-110 px-2" onClick={showPath}>{showSolution ? "Hide" : "Show"} path</button>
+                    <button className="btn h-10 w-[220px] bg-slate-400 rounded hover:brightness-110 px-2 flex items-center justify-center gap-1 relative z-20" onMouseEnter={() => setAlgorithmDropdown(true)} onMouseLeave={() => setAlgorithmDropdown(false)}>
+                        <div className="text">{algorithm}</div>
+                        <img className='w-[12px] h-auto pt-1' src={dropdownImage} alt="" />
+                        {algorithmDropdown && dropdownbox}
+                    </button>
                 </div>
                 <div className="main w-[1000px] h-[700px] bg-slate-700 relative">
                     <div className="grid grid-rows-25 grid-flow-col absolute w-full h-full">
